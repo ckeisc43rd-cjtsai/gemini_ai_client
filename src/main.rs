@@ -1,10 +1,14 @@
 use std::{env, fs, io};
+use dotenv::dotenv;
 use google_generative_ai_rs::v1::gemini::request::{GenerationConfig, SystemInstructionContent, SystemInstructionPart};
 use google_generative_ai_rs::v1::gemini::response::{self, GeminiResponse};
 use google_generative_ai_rs::v1::{
     api::Client,
     gemini::{request::Request, Content, Model, Part, Role},
 };
+use utils::configure_generation_model;
+
+mod utils;
 
 /// JSON-based text request using the public API and an API key for authn
 ///
@@ -17,6 +21,7 @@ use google_generative_ai_rs::v1::{
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
+    dotenv().ok();
 
     #[cfg(not(feature = "beta"))]
     {
@@ -28,14 +33,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(feature = "beta")]
     {
         // Either run as a standard text request or a stream generate content request
+        let model=configure_generation_model(model_name);
         let client: google_generative_ai_rs::v1::api::Client = Client::new_from_model(
             Model::Gemini1_5Pro,
-            "".to_string()
+            env::var("GEMINI_API_KEY").unwrap()
             );
 
-        let system_instruction_path="./src/system_prompt.md";
-        let form_question_path="./src/form_question.json";
-        let form_respond_path="./src/form_respond.json";
+        let system_instruction_path="./src/1_generate_rules/system_prompt.md";
+        let form_question_path="./src/1_generate_rules/form_question.json";
+        let form_respond_path="./src/1_generate_rules/form_respond.json";
         let system_instruction_contents = fs::read_to_string(system_instruction_path)?;
         let form_question_contents = fs::read_to_string(form_question_path)?;
         let form_respond_contents = fs::read_to_string(form_respond_path)?;
