@@ -1,0 +1,19 @@
+[package]
+name = "gemini_ai_client"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+hmac = "0.12"
+sha2 = "0.10"
+base64 = "0.21"
+tokio = { version = "1", features = ["full"] }
+dotenv = "0.15"
+google-generative-ai-rs = { version = "0.3.4", features = ["beta"] }
+env_logger = { version = "0.11" }
+log = { version = "0.4.20" }
+
+[features]
+beta=[]
